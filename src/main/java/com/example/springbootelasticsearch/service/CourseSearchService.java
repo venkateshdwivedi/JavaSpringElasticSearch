@@ -12,6 +12,7 @@ import org.elasticsearch.action.search.SearchRequest;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.client.RequestOptions;
 import org.elasticsearch.client.RestHighLevelClient;
+import org.elasticsearch.common.unit.Fuzziness;
 import org.elasticsearch.index.query.*;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.elasticsearch.search.sort.SortBuilders;
@@ -58,8 +59,9 @@ public class CourseSearchService {
 
         if (q != null && !q.isEmpty()) {
             MultiMatchQueryBuilder multiMatchQuery = QueryBuilders.multiMatchQuery(q)
-                    .field("title")
-                    .field("description");
+                    .field("title", 2.0f)
+                    .field("description")
+                    .fuzziness(Fuzziness.AUTO);
             boolQuery.must(multiMatchQuery);
         }
 
@@ -126,27 +128,22 @@ public class CourseSearchService {
 
     public List<String> suggestTitle(String q) throws IOException {
         CompletionSuggestionBuilder completionSuggestionBuilder = SuggestBuilders
-                .completionSuggestion("suggest") 
-                .prefix(q) 
+                .completionSuggestion("suggest")
+                .prefix(q)
                 .skipDuplicates(true)
-                .size(10); 
+                .size(10);
 
-        
         SuggestBuilder suggestBuilder = new SuggestBuilder();
-        suggestBuilder.addSuggestion("coursesuggest", completionSuggestionBuilder); 
+        suggestBuilder.addSuggestion("coursesuggest", completionSuggestionBuilder);
 
-      
         SearchSourceBuilder sourceBuilder = new SearchSourceBuilder();
         sourceBuilder.suggest(suggestBuilder);
 
-       
         SearchRequest searchRequest = new SearchRequest("courses");
         searchRequest.source(sourceBuilder);
 
-        
         SearchResponse searchResponse = restHighLevelClient.search(searchRequest, RequestOptions.DEFAULT);
 
-       
         Suggest suggest = searchResponse.getSuggest();
         List<String> results = new ArrayList<>();
 
