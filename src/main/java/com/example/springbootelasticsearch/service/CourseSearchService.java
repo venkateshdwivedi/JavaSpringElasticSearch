@@ -1,10 +1,19 @@
 package com.example.springbootelasticsearch.service;
 
+import com.example.springbootelasticsearch.DTO.CourseSearchResponse;
 import com.example.springbootelasticsearch.model.CourseDocument;
 
 import org.elasticsearch.search.sort.SortOrder;
-
+import org.elasticsearch.search.suggest.Suggest;
+import org.elasticsearch.search.suggest.SuggestBuilder;
+import org.elasticsearch.search.suggest.SuggestBuilders;
+import org.elasticsearch.search.suggest.completion.CompletionSuggestionBuilder;
+import org.elasticsearch.action.search.SearchRequest;
+import org.elasticsearch.action.search.SearchResponse;
+import org.elasticsearch.client.RequestOptions;
+import org.elasticsearch.client.RestHighLevelClient;
 import org.elasticsearch.index.query.*;
+import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.elasticsearch.search.sort.SortBuilders;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
@@ -16,8 +25,10 @@ import org.springframework.data.elasticsearch.core.query.NativeSearchQuery;
 import org.springframework.data.elasticsearch.core.query.NativeSearchQueryBuilder;
 import org.springframework.stereotype.Service;
 
+import java.io.IOException;
 import java.time.LocalDate;
 import java.time.ZoneOffset;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -27,7 +38,10 @@ public class CourseSearchService {
     @Autowired
     private ElasticsearchOperations elasticsearchOperations;
 
-    public List<CourseDocument> coursesSearch(
+    @Autowired
+    private RestHighLevelClient restHighLevelClient;
+
+    public CourseSearchResponse coursesSearch(
             String q,
             String category,
             String type,
@@ -98,15 +112,50 @@ public class CourseSearchService {
                 .withPageable(pageable)
                 .build();
 
-
-           
-                
-
         SearchHits<CourseDocument> searchHits = elasticsearchOperations.search(searchQuery, CourseDocument.class);
 
-        return searchHits.getSearchHits().stream()
+        List<CourseDocument> courses = searchHits.getSearchHits().stream()
                 .map(SearchHit::getContent)
                 .collect(Collectors.toList());
 
+        long total = searchHits.getTotalHits();
+
+        return new CourseSearchResponse(total, courses);
+
+    }
+
+    public List<String> suggestTitle(String q) throws IOException {
+        CompletionSuggestionBuilder completionSuggestionBuilder = SuggestBuilders
+                .completionSuggestion("suggest") 
+                .prefix(q) 
+                .skipDuplicates(true)
+                .size(10); 
+
+        
+        SuggestBuilder suggestBuilder = new SuggestBuilder();
+        suggestBuilder.addSuggestion("coursesuggest", completionSuggestionBuilder); 
+
+      
+        SearchSourceBuilder sourceBuilder = new SearchSourceBuilder();
+        sourceBuilder.suggest(suggestBuilder);
+
+       
+        SearchRequest searchRequest = new SearchRequest("courses");
+        searchRequest.source(sourceBuilder);
+
+        
+        SearchResponse searchResponse = restHighLevelClient.search(searchRequest, RequestOptions.DEFAULT);
+
+       
+        Suggest suggest = searchResponse.getSuggest();
+        List<String> results = new ArrayList<>();
+
+        if (suggest != null) {
+            suggest.getSuggestion("coursesuggest")
+                    .getEntries()
+                    .forEach(entry -> entry.getOptions().forEach(option -> results.add(option.getText().string())));
+        }
+
+        return results;
     }
 }
