@@ -56,7 +56,24 @@ Ensure Docker is running and Elasticsearch is up at `localhost:9200` before star
 curl http://localhost:9200
 ```
 
-<pre> <code>```json { "name": "ddb33b43eb60", "cluster_name": "docker-cluster", "cluster_uuid": "HZWhpXq4Twq_a1jAaS-MEg", "version": { "number": "7.17.0", "build_flavor": "default", "build_type": "docker", "build_hash": "bee86328705acaa9a6daede7140defd4d9ec56bd", "build_date": "2022-01-28T08:36:04.875279988Z", "build_snapshot": false, "lucene_version": "8.11.1", "minimum_wire_compatibility_version": "6.8.0", "minimum_index_compatibility_version": "6.0.0-beta1" }, "tagline": "You Know, for Search" } ```</code> </pre>
+{
+  "name": "ddb33b43eb60",
+  "cluster_name": "docker-cluster",
+  "cluster_uuid": "HZWhpXq4Twq_a1jAaS-MEg",
+  "version": {
+    "number": "7.17.0",
+    "build_flavor": "default",
+    "build_type": "docker",
+    "build_hash": "bee86328705acaa9a6daede7140defd4d9ec56bd",
+    "build_date": "2022-01-28T08:36:04.875279988Z",
+    "build_snapshot": false,
+    "lucene_version": "8.11.1",
+    "minimum_wire_compatibility_version": "6.8.0",
+    "minimum_index_compatibility_version": "6.0.0-beta1"
+  },
+  "tagline": "You Know, for Search"
+}
+
 
 
 ---
