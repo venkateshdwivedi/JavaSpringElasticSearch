@@ -35,14 +35,54 @@ REST APIs are provided to query these fields via filters, full-text search, and 
 docker-compose up -d
 ```
 
-### 3.2 Verify Elasticsearch is Running
+### 3.2 Elasticsearch Configuration
+
+The application is configured to connect to Elasticsearch running at `http://localhost:9200`.
+
+This is set in `src/main/resources/application.properties`:
+
+```properties
+spring.application.name=springbootelasticsearch
+spring.elasticsearch.uris=http://localhost:9200
+```
+No authentication is required, and no further changes are needed if you're using the provided `docker-compose.yml` file.
+
+Ensure Docker is running and Elasticsearch is up at `localhost:9200` before starting the application.
+
+
+### 3.3 Verify Elasticsearch is Running
 
 ```bash
 curl http://localhost:9200
 ```
 
+{
+  "name": "ddb33b43eb60",
+  "cluster_name": "docker-cluster",
+  "cluster_uuid": "HZWhpXq4Twq_a1jAaS-MEg",
+  "version": {
+    "number": "7.17.0",
+    "build_flavor": "default",
+    "build_type": "docker",
+    "build_hash": "bee86328705acaa9a6daede7140defd4d9ec56bd",
+    "build_date": "2022-01-28T08:36:04.875279988Z",
+    "build_snapshot": false,
+    "lucene_version": "8.11.1",
+    "minimum_wire_compatibility_version": "6.8.0",
+    "minimum_index_compatibility_version": "6.0.0-beta1"
+  },
+  "tagline": "You Know, for Search"
+}
+
+
 ---
 
 ## 4. Build and Run the Spring Boot Application
 
+```bash
+mvn spring-boot:run
+```
 
+This will start the application at http://localhost:8080 and automatically index data from sample-courses.json.
+
+## 5. Populating the Index
