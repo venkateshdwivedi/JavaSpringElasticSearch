@@ -34,7 +34,7 @@ public class CourseController {
     @RequestParam(defaultValue = "10") int size
     ){
 
-        return courseSearchService.coursesSearch(   q, category, type,
+        return courseSearchService.coursesSearch( q, category, type,
         minAge, maxAge,
         minPrice, maxPrice,
         startDate,

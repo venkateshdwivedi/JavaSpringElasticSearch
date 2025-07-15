@@ -14,7 +14,8 @@ import com.example.springbootelasticsearch.repo.CourseRepo;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 
-import jakarta.annotation.PostConstruct;
+import javax.annotation.PostConstruct;
+
 
 @Service
 public class CourseLoaderService {
@@ -25,7 +26,7 @@ public class CourseLoaderService {
     @PostConstruct
     public void loadCourses() throws IOException {
         ObjectMapper objectMapper = new ObjectMapper();
-        objectMapper.registerModule(new JavaTimeModule());// to handle instant datatype
+        objectMapper.registerModule(new JavaTimeModule());
         InputStream inputStream = new ClassPathResource("sample-courses.json").getInputStream();
 
         CourseDocument[] courses = objectMapper.readValue(inputStream, CourseDocument[].class);
