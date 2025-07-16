@@ -22,8 +22,10 @@ REST APIs are provided to query these fields via filters, full-text search, and 
 ## 2. Prerequisites
 
 - Java 21  
+- Spring Boot 2.7.18  
 - Maven  
 - Docker and Docker Compose
+- Elasticsearch 7.17.0 (automatically handled via Docker)
 
 ---
 
